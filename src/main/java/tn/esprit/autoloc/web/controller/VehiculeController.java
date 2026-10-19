@@ -1,8 +1,10 @@
+
 package tn.esprit.autoloc.web.controller;
 
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.VehiculeService;
+import tn.esprit.autoloc.web.dto.VehiculeDto;
 
 import java.util.List;
 
@@ -17,22 +19,53 @@ public class VehiculeController {
     }
 
     @GetMapping
-    public List<Vehicule> getAllVehicules() {
-        return vehiculeService.getAllVehicules();
+    public List<VehiculeDto> getAllVehicules() {
+        return vehiculeService.getAllVehicules()
+                .stream()
+                .map(this::toDto)
+                .toList();
     }
 
     @GetMapping("/{id}")
-    public Vehicule getVehiculeById(@PathVariable Long id) {
-        return vehiculeService.getVehiculeById(id).orElse(null);
+    public VehiculeDto getVehiculeById(@PathVariable Long id) {
+        return vehiculeService.getVehiculeById(id)
+                .map(this::toDto)
+                .orElse(null);
     }
 
     @PostMapping
-    public Vehicule createVehicule(@RequestBody Vehicule vehicule) {
-        return vehiculeService.saveVehicule(vehicule);
+    public VehiculeDto createVehicule(@RequestBody VehiculeDto dto) {
+        Vehicule vehicule = new Vehicule();
+        vehicule.setImmatriculation(dto.getImmatriculation());
+        vehicule.setMarque(dto.getMarque());
+        vehicule.setModele(dto.getModele());
+        vehicule.setCategorie(dto.getCategorie());
+        vehicule.setTarifJournalier(dto.getTarifJournalier());
+        vehicule.setStatut(dto.getStatut());
+
+        Vehicule saved = vehiculeService.saveVehicule(vehicule);
+        return toDto(saved);
     }
 
     @DeleteMapping("/{id}")
     public void deleteVehicule(@PathVariable Long id) {
         vehiculeService.deleteVehicule(id);
+    }
+
+    private VehiculeDto toDto(Vehicule vehicule) {
+        VehiculeDto dto = new VehiculeDto();
+        dto.setIdVehicule(vehicule.getIdVehicule());
+        dto.setImmatriculation(vehicule.getImmatriculation());
+        dto.setMarque(vehicule.getMarque());
+        dto.setModele(vehicule.getModele());
+        dto.setCategorie(vehicule.getCategorie());
+        dto.setTarifJournalier(vehicule.getTarifJournalier());
+        dto.setStatut(vehicule.getStatut());
+
+        if (vehicule.getAgence() != null) {
+            dto.setIdAgence(vehicule.getAgence().getIdAgence());
+        }
+
+        return dto;
     }
 }

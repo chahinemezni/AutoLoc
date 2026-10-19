@@ -33,5 +33,6 @@ public class Contrat {
     @OneToOne(mappedBy = "contrat")
     private Reservation reservation;
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_contrat")
     private List<Paiement> paiements;
 }

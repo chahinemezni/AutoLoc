@@ -2,7 +2,7 @@ package tn.esprit.autoloc.service;
 
 import org.springframework.stereotype.Service;
 import tn.esprit.autoloc.domain.Vehicule;
-import tn.esprit.autoloc.repository.VehiculeRepository;
+import tn.esprit.autoloc.repository.IVehiculeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +10,9 @@ import java.util.Optional;
 @Service
 public class VehiculeService {
 
-    private final VehiculeRepository vehiculeRepository;
+    private final IVehiculeRepository vehiculeRepository;
 
-    public VehiculeService(VehiculeRepository vehiculeRepository) {
+    public VehiculeService(IVehiculeRepository vehiculeRepository) {
         this.vehiculeRepository = vehiculeRepository;
     }
 
