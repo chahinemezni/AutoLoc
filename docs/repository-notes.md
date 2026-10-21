@@ -1,20 +1,65 @@
-# Atelier 3 – Repository
+# Atelier 4 – Couche Service
 
-## 1. Choix de l'interface
+## A. Injection par constructeur et par attribut
 
-J'ai utilisé `JpaRepository` pour les 9 repositories du projet. Cette interface permet de faire les opérations de base sur la base de données comme ajouter, rechercher, modifier et supprimer des données. Elle permet aussi de faire du tri et de la pagination.
+| Injection par constructeur | Injection par attribut |
+|---|---|
+| Dépendances visibles | Dépendances moins visibles |
+| Permet d'utiliser `final` | Ne permet pas d'utiliser `final` sur le champ injecté |
+| Facilite les tests | Rend les tests plus difficiles |
+| Recommandée par Spring | Moins recommandée |
 
-## 2. Corrections SonarQube
+## B. Injection des dépendances
 
-### 1. Contrat.java
+Les neuf services utilisent `@Service`, `@RequiredArgsConstructor` et un repository déclaré avec `private final`.
 
-Sonar signalait un problème au niveau de la relation entre `Contrat` et `Paiement`. La relation `@OneToMany` ne précisait pas la colonne de jointure.
+| Service | Repository |
+|---|---|
+| AgenceServiceImpl | IAgenceRepository |
+| EmployeServiceImpl | IEmployeRepository |
+| VehiculeServiceImpl | IVehiculeRepository |
+| EquipementServiceImpl | IEquipementRepository |
+| ClientServiceImpl | IClientRepository |
+| ReservationServiceImpl | IReservationRepository |
+| ContratServiceImpl | IContratRepository |
+| PaiementServiceImpl | IPaiementRepository |
+| MaintenanceServiceImpl | IMaintenanceRepository |
 
-Pour corriger ça, j'ai ajouté `@JoinColumn(name = "id_contrat")` afin de préciser la clé étrangère utilisée pour cette relation.
+## C. Erreurs Spring
 
-### 2. VehiculeController.java
+1. **Bean introuvable :** vérifier `@Service` et le package de la classe.
+2. **Plusieurs beans :** utiliser `@Primary` ou `@Qualifier`.
+3. **Dépendance circulaire :** modifier la conception pour supprimer la dépendance entre les deux services.
 
-Sonar signalait que le contrôleur utilisait directement l'entité `Vehicule` dans les requêtes et les réponses.
+## D. Qualité du code et SonarQube
 
-J'ai créé la classe `VehiculeDto` et modifié le contrôleur pour utiliser ce DTO à la place de l'entité. Ça permet de séparer les données envoyées par l'API de celles utilisées par la base de données.
+L'analyse SonarQube n'a affiché aucun problème, aucun Security Hotspot et aucune vulnérabilité liée aux données.
 
+Pour améliorer la qualité du code, les services utilisent l'injection par constructeur et `ResourceNotFoundException` pour gérer les ressources introuvables. Le contrôleur utilise également `VehiculeDto` au lieu d'exposer directement l'entité.
+
+## E. Questions
+
+**1. Qui crée `ContratServiceImpl` ?**
+
+Spring crée le service au démarrage grâce à `@Service`.
+
+**2. Pourquoi utiliser `IContratService` ?**
+
+Pour réduire le couplage et faciliter les tests.
+
+**3. Pourquoi un service singleton doit-il rester sans état ?**
+
+Pour éviter que plusieurs requêtes partagent des données temporaires.
+
+**4. Pourquoi charger l'entité avant de la modifier ?**
+
+Pour vérifier qu'elle existe et modifier uniquement les champs nécessaires.
+
+**5. Différences entre les annotations :**
+
+- `@Component` : détecte une classe comme bean Spring.
+- `@Bean` : déclare un bean à partir d'une méthode.
+- `@Primary` : choisit un bean par défaut.
+- `@Qualifier` : choisit un bean précis.
+
+`IPaiementService` contient seulement `findById()` et `findAll()`, car les paiements sont gérés à travers les contrats.

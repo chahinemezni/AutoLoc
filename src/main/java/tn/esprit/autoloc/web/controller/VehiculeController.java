@@ -3,7 +3,7 @@ package tn.esprit.autoloc.web.controller;
 
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Vehicule;
-import tn.esprit.autoloc.service.VehiculeService;
+import tn.esprit.autoloc.service.IVehiculeService;
 import tn.esprit.autoloc.web.dto.VehiculeDto;
 
 import java.util.List;
@@ -12,15 +12,15 @@ import java.util.List;
 @RequestMapping("/api/vehicules")
 public class VehiculeController {
 
-    private final VehiculeService vehiculeService;
+    private final IVehiculeService vehiculeService;
 
-    public VehiculeController(VehiculeService vehiculeService) {
+    public VehiculeController(IVehiculeService vehiculeService) {
         this.vehiculeService = vehiculeService;
     }
 
     @GetMapping
     public List<VehiculeDto> getAllVehicules() {
-        return vehiculeService.getAllVehicules()
+        return vehiculeService.findAll()
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -28,9 +28,7 @@ public class VehiculeController {
 
     @GetMapping("/{id}")
     public VehiculeDto getVehiculeById(@PathVariable Long id) {
-        return vehiculeService.getVehiculeById(id)
-                .map(this::toDto)
-                .orElse(null);
+        return toDto(vehiculeService.findById(id));
     }
 
     @PostMapping
@@ -43,13 +41,30 @@ public class VehiculeController {
         vehicule.setTarifJournalier(dto.getTarifJournalier());
         vehicule.setStatut(dto.getStatut());
 
-        Vehicule saved = vehiculeService.saveVehicule(vehicule);
+        Vehicule saved = vehiculeService.create(vehicule);
         return toDto(saved);
+    }
+
+    @PutMapping("/{id}")
+    public VehiculeDto updateVehicule(
+            @PathVariable Long id,
+            @RequestBody VehiculeDto dto) {
+
+        Vehicule vehicule = new Vehicule();
+        vehicule.setImmatriculation(dto.getImmatriculation());
+        vehicule.setMarque(dto.getMarque());
+        vehicule.setModele(dto.getModele());
+        vehicule.setCategorie(dto.getCategorie());
+        vehicule.setTarifJournalier(dto.getTarifJournalier());
+        vehicule.setStatut(dto.getStatut());
+
+        Vehicule updated = vehiculeService.update(id, vehicule);
+        return toDto(updated);
     }
 
     @DeleteMapping("/{id}")
     public void deleteVehicule(@PathVariable Long id) {
-        vehiculeService.deleteVehicule(id);
+        vehiculeService.deleteById(id);
     }
 
     private VehiculeDto toDto(Vehicule vehicule) {
