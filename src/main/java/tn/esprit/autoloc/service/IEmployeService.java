@@ -15,4 +15,8 @@ public interface IEmployeService {
     Employe update(Long id, Employe employe);
 
     void deleteById(Long id);
+
+    Employe desaffecterEmploye(Long idEmploye);
+
+    Employe affecterEmploye(Long idEmploye, Long idAgence);
 }

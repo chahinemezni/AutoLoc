@@ -80,4 +80,15 @@ public class EmployeController {
             @PathVariable Long id) {
         employeService.deleteById(id);
     }
+    @PutMapping("/{idEmploye}/desaffecter")
+    public Employe desaffecterEmploye(@PathVariable Long idEmploye) {
+        return employeService.desaffecterEmploye(idEmploye);
+    }
+
+    @PutMapping("/{idEmploye}/affecter/{idAgence}")
+    public Employe affecterEmploye(
+            @PathVariable Long idEmploye,
+            @PathVariable Long idAgence) {
+        return employeService.affecterEmploye(idEmploye, idAgence);
+    }
 }

@@ -3,8 +3,9 @@ package tn.esprit.autoloc.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tn.esprit.autoloc.domain.Employe;
+import tn.esprit.autoloc.domain.*;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
+import tn.esprit.autoloc.repository.IAgenceRepository;
 import tn.esprit.autoloc.repository.IEmployeRepository;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.List;
 public class EmployeServiceImpl implements IEmployeService {
 
     private final IEmployeRepository employeRepository;
+    private final IAgenceRepository agenceRepository;
 
     @Override
     public Employe create(Employe employe) {
@@ -57,6 +59,29 @@ public class EmployeServiceImpl implements IEmployeService {
         employeRepository.deleteById(id);
     }
 
+    @Override
+    public Employe desaffecterEmploye(Long idEmploye) {
+        Employe employe = employeRepository.findById(idEmploye)
+                .orElseThrow(() -> new RuntimeException("Employe introuvable"));
+
+        employe.setAgence(null);
+
+        return employeRepository.save(employe);
+    }
+
+    @Override
+    public Employe affecterEmploye(Long idEmploye, Long idAgence) {
+        Employe employe = employeRepository.findById(idEmploye)
+                .orElseThrow(() -> new RuntimeException("Employe introuvable"));
+
+        Agence agence = agenceRepository.findById(idAgence)
+                .orElseThrow(() -> new RuntimeException("Agence introuvable"));
+
+        employe.setAgence(agence);
+
+        return employeRepository.save(employe);
+    }
+
     private void validate(Employe employe) {
         if (employe.getNom() == null || employe.getNom().isBlank()
                 || employe.getRole() == null) {
@@ -64,4 +89,5 @@ public class EmployeServiceImpl implements IEmployeService {
                     "Le nom et le rôle de l'employé sont obligatoires");
         }
     }
+
 }

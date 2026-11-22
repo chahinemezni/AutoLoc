@@ -80,4 +80,24 @@ public class VehiculeController {
             @PathVariable Long id) {
         vehiculeService.deleteById(id);
     }
+    @PutMapping("/{idVehicule}/affecter-agence/{idAgence}")
+    public Vehicule affecterVehicule(
+            @PathVariable Long idVehicule,
+            @PathVariable Long idAgence) {
+        return vehiculeService.affecterVehicule(idVehicule, idAgence);
+    }
+
+    @PutMapping("/{idVehicule}/affecter-equipement/{idEquipement}")
+    public Vehicule affecterEquipement(
+            @PathVariable Long idVehicule,
+            @PathVariable Long idEquipement) {
+        return vehiculeService.affecterEquipement(idVehicule, idEquipement);
+    }
+
+    @PutMapping("/{idVehicule}/desaffecter-equipement/{idEquipement}")
+    public Vehicule desaffecterEquipement(
+            @PathVariable Long idVehicule,
+            @PathVariable Long idEquipement) {
+        return vehiculeService.desaffecterEquipement(idVehicule, idEquipement);
+    }
 }
